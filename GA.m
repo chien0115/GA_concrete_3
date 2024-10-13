@@ -12,21 +12,21 @@ num_sites = 5; % 工地
 % num_sites_with_factory = num_sites + 1; % 包括工廠的總工地數
 
 t = 5; % 卡車數
-s=100;%好的染色體
+s=20;%好的染色體
 r=10;%number of chromosomes passing between runs每次運行之間傳遞的染色體數 比較佳的染色體
 crossoverRate = 0.8; % 定義交配率
 mutationRate = 0.2; % 突變率
-max_generations_without_improvement = 10; % 設定多少代沒有變化認為收斂
+max_generations_without_improvement = 1000000; % 設定多少代沒有變化認為收斂
 tolerance = 0.0001; % 設定適應度變化的容忍值
 
 
 
 %480->早上8點
-time_windows = [480, 1440;
-    480, 1440;
-    510, 1440;
-    480, 1440;
-    480, 1440;]; % 每個工地的時間窗(每個工地每天開始、結束時間)
+time_windows = [480, 600;
+    480, 600;
+    510, 600;
+    480, 600;
+    480, 600;]; % 每個工地的時間窗(每個工地每天開始、結束時間)
 % route = [1, 2, 3, 4, 5]; % 染色體示例：工廠到工地的路徑
 
 time = [
@@ -34,13 +34,13 @@ time = [
     25, 20;  % 去程到工地 2 需要 25 分鐘，回程需要 20 分鐘
     40, 30;  % 去程到工地 3 需要 40 分鐘，回程需要 30 分鐘
     15, 15;  % 去程到工地 4 需要 35 分鐘，回程需要 30 分鐘
-    30, 30;  % 去程到工地 5 需要 20 分鐘，回程需要 15 分鐘
+    35, 30;% 去程到工地 5 需要 20 分鐘，回程需要 15 分鐘
     ];
 
 % 定義各工地的參數
 max_interrupt_time = [5, 5, 15,5,5]; % 工地最大容許中斷時間 (分鐘)
 work_time = [20, 30, 25,10,35]; % 各工地施工時間 (分鐘)
-demand_trips = [2, 2, 4, 4, 2]; % 各工地需求車次
+demand_trips = [2,2,4,4,2]; % 各工地需求車次
 penalty = 24*60;% 懲罰值
 
 
@@ -71,30 +71,29 @@ for i = 1:tg
     % 評估操作 每個染色體的適應值 OK
     E = evaluation(P, t, time_windows, num_sites, dispatch_times, work_time, time, max_interrupt_time,  demand_trips, penalty); % 評估族群 P 中每個染色體的適應度
 
+    L=max(E);
 
     % 選擇最好的染色體 目前設定選s個 OK
-    [P, S, best_dispatch_times] = selection(P, E, s, dispatch_times);
+
+    [A, S, best_dispatch_times] = selection(P, E, s, dispatch_times,L);
     %P:選出來的染色體   S:適應值大小  best_dispatch_times:最好的派遣時間
 
-    A=P;
+    %現在A是最好的染色體     %S最好適應度
     B=best_dispatch_times;
 
     cr_num=0;
     dispatch_times_cross = [];
-    dispatch_times_mutation = [];
-
 
     % 初始化
     C = []; % 初始化 C 為空矩陣
-    M = []; % 初始化 M 為空矩陣
 
     %把好的作交配、變異
-    % 交配操作
+    % 交配操作  目前剩280
     for j = 1:(n-s)
-        if cr_num < n-s % 扣除前面selection先選的
+        if cr_num < n-s % 確保還有足夠的染色體進行交配
             rand_crossover = rand();
             if rand_crossover <= crossoverRate
-                [C_temp, dispatch_times_cross_temp] = crossover(P, t, dispatch_times);
+                [C_temp, dispatch_times_cross_temp] = crossover(A, t, B);
 
                 % 添加交配后的两个新染色体
                 C = [C; C_temp(1, :)];
@@ -104,30 +103,32 @@ for i = 1:tg
                 dispatch_times_cross = [dispatch_times_cross; dispatch_times_cross_temp(1, :)];
                 dispatch_times_cross = [dispatch_times_cross; dispatch_times_cross_temp(2, :)];
 
-                cr_num = cr_num + 2; % 更新 cr_num
+                cr_num = cr_num + 2; % 更新交配次數
             else
-                % 保留兩個原染色體
-                C = [C; P(2*j-1, :)]; % 保留第 2*i-1 個染色體
-                dispatch_times_cross = [dispatch_times_cross; dispatch_times(2*j-1, :)]; % 保留第一個染色體及派遣時間
+                % 如果沒有交配，保留原染色體，但需要確保不超出範圍
+                if (2*j-1) <= size(P, 1) && (2*j) <= size(P, 1)
+                    % 保留第 2*j-1 和 第 2*j 染色體
+                    C = [C; P(2*j-1, :)];
+                    dispatch_times_cross = [dispatch_times_cross; dispatch_times(2*j-1, :)];
 
-                if 2*j <= size(P,1) % 確保不超出數組長度，確保 i+1 對應的染色體存在
-                    C = [C; P(2*j,:)]; % 保留第 2*i 個染色體
-                    dispatch_times_cross = [dispatch_times_cross; dispatch_times(2*j, :)]; % 保留第二個染色體及派遣時間
+                    C = [C; P(2*j, :)];
+                    dispatch_times_cross = [dispatch_times_cross; dispatch_times(2*j, :)];
+
+                    cr_num = cr_num + 2; % 更新交配次數
                 end
-
-                cr_num = cr_num + 2; % 因為每次保留兩個染色體，所以增加 2
             end
         end
     end
 
-
     [x1 y1]=size(C);
+    dispatch_times_mutation = [];
 
     % 修復交配後的染色體
     for j = 1:x1
         C(j, :) = repair(C(j, :), demand_trips);
     end
 
+    M = []; % 初始化 M 為空矩陣
 
     % 突變操作
     for k = 1:x1
@@ -144,11 +145,6 @@ for i = 1:tg
     end
     % disp(['Final Result (M): Size = ', num2str(size(M))]);
 
-
-    % % 突變操作後的修復
-    % for k = 1:size(M, 1)
-    %     M(k, :) = fixxxx(M(k, :), demand_trips);  % 修復突變後的染色體，確保派遣合理性
-    % end
 
     % 統整(selection、crossover、mutation)
     P=[A;M];
