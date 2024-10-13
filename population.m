@@ -46,7 +46,7 @@ for i = 1:n
 
 
         % 使用線性加權的隨機時間生成 (偏向早期)
-        random_time = rand()^10; % 這裡使用平方來偏向小的值，即較早的時間
+        random_time = rand()^50; % 這裡使用平方來偏向小的值，即較早的時間
         dispatch_time = early_time + random_time * (time_range)-time(site_idx,1); % 將其轉換到具體時間範圍內
 
         % 將派遣時間四捨五入為整數
