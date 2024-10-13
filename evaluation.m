@@ -92,13 +92,8 @@ function E = evaluation(P, t, time_windows, num_sites, dispatch_times, work_time
             end
         end
 
-        % % 讓工地等
-        % total_penalty_time_truck =sum(penalty_truck_time);
-        % %讓卡車等
-        % total_penalty_time_side=sum(penalty_side_time);
-
         % 計算總懲罰值（基於每小時的懲罰率）
-        total_penalty = (penalty_side_time * penalty)-penalty_truck_time;
+        total_penalty = (penalty_side_time * penalty)+penalty_truck_time;
 
         % 計算適應度值（假設目標是最小化總懲罰值）
         H(i) = total_penalty;
