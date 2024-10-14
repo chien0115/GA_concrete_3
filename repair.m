@@ -77,23 +77,7 @@ function repaired_chromosome = repair(chromosome, demand_trips)
         end
     end
 
-    % % 最後檢查並打破連續的相同工地
-    % i = 1;
-    % while i < length(chromosome)
-    %     if chromosome(i) == chromosome(i+1)
-    %         % 找到不同的工地來替換
-    %         for j = i+2:length(chromosome)
-    %             if chromosome(j) ~= chromosome(i)
-    %                 % 交換位置
-    %                 temp = chromosome(i+1);
-    %                 chromosome(i+1) = chromosome(j);
-    %                 chromosome(j) = temp;
-    %                 break;
-    %             end
-    %         end
-    %     end
-    %     i = i + 1;
-    % end
+
 
     % 返回修復後的染色體
     repaired_chromosome = chromosome;
