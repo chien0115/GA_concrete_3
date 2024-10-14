@@ -9,10 +9,15 @@ function [Y, dispatch_times_new2] = mutation(P, t, dispatch_times)
     A1 = P(r1, 1:y1); % 取出選中的染色體 (派遣順序)
     dispatch_times1 = dispatch_times(r1, :); % 取出對應的派遣時間
 
+
+    random_number1 = rand();
+    random_number2 = rand();
+
     % 定義派遣順序的突變位置（無奇數位置限制）
-    pos = randperm(y1, 2); % 隨機選擇兩個不同的位置
+    pos1=ceil(random_number1*y1);
+    pos2=ceil(random_number2*y1);
     % 交換所選位置的值（調整派遣順序）
-    A1([pos(1), pos(2)]) = A1([pos(2), pos(1)]);
+    A1([pos1, pos2]) = A1([pos2, pos1]);
 
     A2=A1;
     % 同時對派遣時間進行突變
