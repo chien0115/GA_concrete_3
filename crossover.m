@@ -9,9 +9,19 @@ function [Y, dispatch_times_new] = crossover(P, t, dispatch_times)
     parent2 = P(parent_indices(2), :);
     dispatch_times1 = dispatch_times(parent_indices(1), :);
     dispatch_times2 = dispatch_times(parent_indices(2), :);
-    
+
+
+    % 假設 random_number1 和 random_number2 是隨機生成的浮點數，介於 0 到 1 之間
+    random_number1 = rand();
+    random_number2 = rand();
+
+    % 計算交配點，並取整數
+    point1 = ceil(random_number1 * (chromosome_length - 1));
+    point2 = ceil(random_number2 * (chromosome_length - 1));
+
+
     % 生成兩個隨機的染色體交配點
-    crossover_points = sort(randi([1, chromosome_length - 1], 1, 2));
+    crossover_points = sort([point1, point2]);
     point1 = crossover_points(1);
     point2 = crossover_points(2);
     dispatch_crossover_point = randi([1, t - 1]);
