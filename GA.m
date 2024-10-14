@@ -69,7 +69,7 @@ for i = 1:tg
 
 
     % 評估操作 每個染色體的適應值 OK
-    E = evaluation(P, t, time_windows, num_sites, dispatch_times, work_time, time, max_interrupt_time,  demand_trips, penalty); % 評估族群 P 中每個染色體的適應度
+    E = evaluation(P, t, time_windows, num_sites, dispatch_times, work_time, time, max_interrupt_time, penalty); % 評估族群 P 中每個染色體的適應度
 
     L=max(E);
 
@@ -153,7 +153,7 @@ for i = 1:tg
 
 
     %再次評估適應度 計算平均適應度最佳適應度
-    E = evaluation(P, t, time_windows, num_sites, dispatch_times, work_time, time, max_interrupt_time,  demand_trips, penalty); % 評估族群 P 中每個染色體的適應度
+    E = evaluation(P, t, time_windows, num_sites, dispatch_times, work_time, time, max_interrupt_time,penalty); % 評估族群 P 中每個染色體的適應度
 
     % 記錄適應度
     K(i, 1) = sum(E) / n; % 平均適應度
