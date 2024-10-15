@@ -17,6 +17,12 @@ function [Y, dispatch_times_new2] = mutation(P, t, dispatch_times)
     pos1=ceil(random_number1*y1);
     pos2=ceil(random_number2*y1);
     % 交換所選位置的值（調整派遣順序）
+    
+    while A1(pos1) == A1(pos2)
+    % 如果相同，隨機選擇新的位置
+    pos2 = ceil(rand() * y1); % 使用 rand() 隨機生成新的 pos2
+    end
+    
     A1([pos1, pos2]) = A1([pos2, pos1]);
 
     A2=A1;
