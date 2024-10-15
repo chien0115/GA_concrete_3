@@ -171,7 +171,7 @@ end
 
 % 提取最佳適應度值和最優解
 best_chromosome = P(index, :); % 提取基因部分
-best_chromosome_dispatch_times=best_dispatch_times(index, :);
+best_chromosome_dispatch_times=dispatch_times(index, :);
 
 
 disp('Best Chromosome:');
